@@ -2,23 +2,29 @@ import {
   constructTable,
   tableFeatures,
 
-  // sorting
+  // Sorting
   rowSortingFeature,
   createSortedRowModel,
 
-  // filtering
+  // Column filtering
   columnFilteringFeature,
-  globalFilteringFeature,
   createFilteredRowModel,
+  filterFn_includesString,
 
-  // pagination
+  // Pagination
   rowPaginationFeature,
   createPaginatedRowModel,
 } from "@tanstack/table-core";
 
 import { FlexRender } from "@tanstack/table-core/flex-render";
 
-import { storeReactivityBindings } from "@tanstack/table-core/store-reactivity-bindings";
+import { storeReactivityBindings } from
+  "@tanstack/table-core/store-reactivity-bindings";
+
+
+// ==================================================
+// DATA
+// ==================================================
 
 const data = [
   {
@@ -58,53 +64,107 @@ const data = [
   },
 ];
 
+
+// ==================================================
+// FEATURES
+// ==================================================
+
 const features = tableFeatures({
   coreReactivityFeature: storeReactivityBindings(),
 
-  // sorting
+  // ------------------------------------------------
+  // Sorting
+  // ------------------------------------------------
+
   rowSortingFeature,
+
   sortedRowModel: createSortedRowModel(),
 
-  // filtering
+
+  // ------------------------------------------------
+  // Column Filtering
+  // ------------------------------------------------
+
   columnFilteringFeature,
-  globalFilteringFeature,
+
   filteredRowModel: createFilteredRowModel(),
 
-  // pagination
+  filterFns: {
+    includesString: filterFn_includesString,
+  },
+
+
+  // ------------------------------------------------
+  // Pagination
+  // ------------------------------------------------
+
   rowPaginationFeature,
+
   paginatedRowModel: createPaginatedRowModel(),
 });
+
+
+// ==================================================
+// COLUMNS
+// ==================================================
 
 const columns = [
   {
     accessorKey: "id",
+
     header: "ID",
+
     cell: (info) => info.getValue(),
+
+    filterFn: "includesString",
   },
+
   {
     accessorKey: "name",
+
     header: "Name",
+
     cell: (info) => info.getValue(),
+
+    filterFn: "includesString",
   },
+
   {
     accessorKey: "age",
+
     header: "Age",
+
     cell: (info) => info.getValue(),
+
+    filterFn: "includesString",
   },
 ];
 
+
+// ==================================================
+// CREATE TABLE
+// ==================================================
+
 const table = constructTable({
   features,
+
   columns,
+
   data,
 
   initialState: {
     pagination: {
       pageIndex: 0,
+
       pageSize: 3,
     },
   },
 });
+
+
+// ==================================================
+// APP
+// ==================================================
 
 const app = document.querySelector("#app");
 
@@ -112,102 +172,238 @@ if (!app) {
   throw new Error("Missing #app element");
 }
 
+
+// ==================================================
+// RENDER TABLE
+// ==================================================
+
 function renderTable() {
-  const search = document.createElement("input");
-
-  search.placeholder = "Search...";
-
-  search.value = table.store.state.globalFilter ?? "";
-
-  search.addEventListener("input", (event) => {
-    table.setGlobalFilter(event.target.value);
-  });
 
   const tableElement = document.createElement("table");
 
   const thead = document.createElement("thead");
+
   const tbody = document.createElement("tbody");
 
+
+  // ==================================================
   // HEADER
+  // ==================================================
+
   table.getHeaderGroups().forEach((headerGroup) => {
-    const tr = document.createElement("tr");
+
+    // ----------------------------------------------
+    // Header row
+    // ----------------------------------------------
+
+    const headerRow = document.createElement("tr");
+
+
+    // ----------------------------------------------
+    // Filter row
+    // ----------------------------------------------
+
+    const filterRow = document.createElement("tr");
+
 
     headerGroup.headers.forEach((header) => {
-      const th = document.createElement("th");
+
+      const headerCell = document.createElement("th");
+
+      const filterCell = document.createElement("th");
+
 
       if (!header.isPlaceholder) {
-        th.textContent = String(FlexRender({ header }) ?? "");
 
-        // Click header to sort
-        th.addEventListener("click", (event) => {
-          header.column.getToggleSortingHandler()?.(event);
+        // ==========================================
+        // COLUMN NAME
+        // ==========================================
+
+        headerCell.textContent = String(
+          FlexRender({ header }) ?? ""
+        );
+
+
+        // ==========================================
+        // SORTING
+        // ==========================================
+
+        headerCell.addEventListener("click", (event) => {
+
+          header.column
+            .getToggleSortingHandler()
+            ?. (event);
+
         });
+
+
+        // ==========================================
+        // COLUMN SEARCH
+        // ==========================================
+
+        const input = document.createElement("input");
+
+        input.type = "text";
+
+        input.placeholder = "Search...";
+
+
+        // Show existing filter value
+        input.value = String(
+          header.column.getFilterValue() ?? ""
+        );
+
+
+        // Update column filter
+        input.addEventListener("input", (event) => {
+
+          header.column.setFilterValue(
+            event.target.value
+          );
+
+        });
+
+
+        filterCell.appendChild(input);
       }
 
-      tr.appendChild(th);
+
+      headerRow.appendChild(headerCell);
+
+      filterRow.appendChild(filterCell);
+
     });
 
-    thead.appendChild(tr);
+
+    thead.appendChild(headerRow);
+
+    thead.appendChild(filterRow);
+
   });
 
+
+  // ==================================================
   // BODY
+  // ==================================================
+
   table.getRowModel().rows.forEach((row) => {
+
     const tr = document.createElement("tr");
 
+
     row.getAllCells().forEach((cell) => {
+
       const td = document.createElement("td");
 
-      td.innerHTML = String(FlexRender({ cell }) ?? "");
+
+      td.textContent = String(
+        FlexRender({ cell }) ?? ""
+      );
+
 
       tr.appendChild(td);
+
     });
 
+
     tbody.appendChild(tr);
+
   });
 
-  // ------------------------------------------------
+
+  // ==================================================
   // PAGINATION
-  // ------------------------------------------------
+  // ==================================================
 
   const pagination = document.createElement("div");
 
+
+  // ----------------------------------------------
   // Previous
+  // ----------------------------------------------
+
   const previous = document.createElement("button");
 
   previous.textContent = "Previous";
 
-  previous.disabled = !table.getCanPreviousPage();
+  previous.disabled =
+    !table.getCanPreviousPage();
+
 
   previous.addEventListener("click", () => {
+
     table.previousPage();
+
   });
 
+
+  // ----------------------------------------------
   // Page number
+  // ----------------------------------------------
+
   const page = document.createElement("span");
 
-  page.textContent = ` Page ${table.store.state.pagination.pageIndex + 1} `;
+  page.textContent =
+    ` Page ${
+      table.store.state.pagination.pageIndex + 1
+    } `;
 
+
+  // ----------------------------------------------
   // Next
+  // ----------------------------------------------
+
   const next = document.createElement("button");
 
   next.textContent = "Next";
 
-  next.disabled = !table.getCanNextPage();
+  next.disabled =
+    !table.getCanNextPage();
+
 
   next.addEventListener("click", () => {
+
     table.nextPage();
+
   });
 
-  pagination.append(previous, page, next);
+
+  pagination.append(
+    previous,
+    page,
+    next
+  );
+
+
+  // ==================================================
+  // PUT EVERYTHING INTO DOM
+  // ==================================================
 
   tableElement.appendChild(thead);
+
   tableElement.appendChild(tbody);
 
-  app.replaceChildren(search, tableElement, pagination);
+
+  app.replaceChildren(
+    tableElement,
+    pagination
+  );
 }
 
+
+// ==================================================
+// TABLE STATE CHANGES
+// ==================================================
+
 table.store.subscribe(() => {
+
   renderTable();
+
 });
+
+
+// ==================================================
+// INITIAL RENDER
+// ==================================================
 
 renderTable();
