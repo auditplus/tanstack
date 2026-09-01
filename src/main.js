@@ -24,7 +24,7 @@ async function start() {
       initialState: {
         pagination: {
           pageIndex: 0,
-          pageSize: 5,
+          pageSize: 8,
         },
       },
     });

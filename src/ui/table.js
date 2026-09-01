@@ -1,5 +1,4 @@
-import { FlexRender } from
-    "@tanstack/table-core/flex-render";
+import { FlexRender } from "@tanstack/table-core/flex-render";
 
 
 export function renderTable(table, app) {
