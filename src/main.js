@@ -70,17 +70,17 @@ const features = tableFeatures({
   coreReactivityFeature: storeReactivityBindings(),
 
   // Sorting
-  rowSortingFeature,
-  sortedRowModel: createSortedRowModel(),
+  rowSortingFeature, // This table can sort
+  sortedRowModel: createSortedRowModel(), // When it sort, figure out what new row order should be
 
   // Column Filtering
-  columnFilteringFeature,
-  filteredRowModel: createFilteredRowModel(),
-  filterFns: { includesString: filterFn_includesString },
+  columnFilteringFeature, // column can have filtering feature
+  filteredRowModel: createFilteredRowModel(), // figure out which rows should remain after filtering
+  filterFns: { includesString: filterFn_includesString }, // When I'm searching text, use this method to compare the text, includesString: Does this value contain what the user typed?
 
   // Pagination
-  rowPaginationFeature,
-  paginatedRowModel: createPaginatedRowModel(),
+  rowPaginationFeature, // This table supports pagination.
+  paginatedRowModel: createPaginatedRowModel(), //Figure out which rows belong to the current page
 });
 
 // ==================================================
@@ -89,10 +89,10 @@ const features = tableFeatures({
 
 const columns = [
   {
-    accessorKey: "id",
+    accessorKey: "id", // which proper from 'my data' belongs to this table
     header: "ID",
     cell: (info) => info.getValue(),
-    filterFn: "includesString",
+    filterFn: "includesString", // When filtering the Name column, use includesString
   },
 
   {
@@ -178,7 +178,7 @@ function renderTable() {
         // ==========================================
 
         headerCell.addEventListener("click", (event) => {
-          header.column.getToggleSortingHandler()?.(event);
+          header.column.getToggleSortingHandler()?.(event); // when user clicks the column sort it
         });
 
         // ==========================================
