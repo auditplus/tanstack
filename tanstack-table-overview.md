@@ -52,9 +52,9 @@ The click handler is wired in `src/ui/table.js` using:
 
 Enabled in `src/table/features.js`.
 
-Adds filter support to columns. Each column can have its own filter logic, and the table automatically filters rows based on the current filter values.
+Adds filter support to columns. In this final version, the filter row is no longer rendered in the UI because the app uses a request panel and a response-driven table instead of inline text filters.
 
-The UI creates filter inputs under the headers in `src/ui/table.js`.
+The filtering support remains available in the feature set, but the current interface does not expose it visually.
 
 ## 6) `filterFn_includesString`
 
@@ -108,14 +108,14 @@ Each column includes:
 
 Current active columns include:
 
-- `id`
-- `firstName`
-- `lastName`
-- `age`
-- `birthDate`
-- `gender`
+- `name`
+- `assetValue`
+- `sold`
+- `saleValue`
+- `profitValue`
+- `profitPercentage`
 
-The `email` column is currently commented out in `src/table/columns.js` and is not active in the table.
+The older user-based columns are kept only as commented examples in `src/table/columns.js` and are not active in the rendered table.
 
 ## 10) `FlexRender`
 
@@ -146,10 +146,12 @@ On each column, these TanStack methods are used:
 
 - `header.column.getToggleSortingHandler()`
   - Activates the sort toggle when the header is clicked.
+- `header.column.getIsSorted()`
+  - Reads the current sort direction for the column.
 - `header.column.getFilterValue()`
-  - Reads the current filter value for that column.
+  - Reads the current filter value for that column when filters are enabled.
 - `header.column.setFilterValue(value)`
-  - Updates the filter value in TanStack state.
+  - Updates the filter value in TanStack state when filters are enabled.
 
 This is the key point: the code is not using plain DOM table logic. It is using TanStack's table state and model, then converting that into HTML in the browser.
 
@@ -223,9 +225,9 @@ These are all the TanStack table pieces actually used in the app:
 - `header.column.getIsSorted()`
   - Returns the current sort direction for the column (`asc`, `desc`, or false).
 - `header.column.getFilterValue()`
-  - Reads the active filter value for that column.
+  - Reads the active filter value for that column when filtering is used.
 - `header.column.setFilterValue(value)`
-  - Updates the filter value in TanStack state.
+  - Updates the filter value in TanStack state when filtering is used.
 - `table.getRowModel().rows`
   - Gets the visible rows after sorting/filtering/pagination.
 - `row.getAllCells()`
@@ -233,7 +235,7 @@ These are all the TanStack table pieces actually used in the app:
 - `cell.getValue()` / `info.getValue()`
   - Reads the raw value from the current cell or column cell context.
 - `row.getValue(columnId)`
-  - Reads a value from a row by column id, used in the custom gender filter.
+  - Reads a value from a row by column id, used in the custom gender filter and older examples.
 
 ### Pagination actions
 
@@ -257,12 +259,12 @@ This app uses TanStack Table for:
 
 - rendering rows and columns
 - sorting by clicking headers
-- filtering by text and custom logic
 - pagination
 - reactive state updates
 - DOM rendering via custom UI code
+- receiving data from the request panel and rendering it in table form
 
-The current active columns are `id`, `firstName`, `lastName`, `age`, `birthDate`, and `gender`.
-The `email` column is present in the code as a commented-out example and is not currently used by the rendered table.
+The current active columns are `name`, `assetValue`, `sold`, `saleValue`, `profitValue`, and `profitPercentage`.
+The older user-based columns remain only as commented examples and are not part of the active rendered table.
 
-In short, TanStack Table is acting as the table engine and state manager, while the project’s custom JavaScript is handling the browser rendering and controls.
+In short, TanStack Table is acting as the table engine and state manager, while the project’s custom JavaScript is handling the browser rendering and the API-driven dataset updates.

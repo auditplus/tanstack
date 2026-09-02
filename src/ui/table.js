@@ -18,147 +18,34 @@ export function renderTable(table, app) {
 
     table.getHeaderGroups().forEach((headerGroup) => {
         const headerRow = document.createElement("tr");
-        const filterRow = document.createElement("tr");
 
         headerGroup.headers.forEach((header) => {
             const headerCell = document.createElement("th");
-            const filterCell = document.createElement("th");
 
             if (!header.isPlaceholder) {
-
-                // ------------------------------------------
-                // Header
-                // ------------------------------------------
                 const headerText = String(FlexRender({ header }) ?? "");
-
                 const sorted = header.column.getIsSorted();
 
                 let arrow = "";
 
                 if (sorted === "asc") {
-                arrow = " ↑";
+                    arrow = " ↑";
                 } else if (sorted === "desc") {
-                arrow = " ↓";
+                    arrow = " ↓";
                 }
 
                 headerCell.textContent = headerText + arrow;
 
-
-                // ------------------------------------------
-                // Sorting
-                // ------------------------------------------
-
                 headerCell.addEventListener("click", (event) => {
-                        header.column.getToggleSortingHandler()?.(event);
-                    }
-                );
-
-                // ------------------------------------------
-                // Gender dropdown
-                // ------------------------------------------
-
-                if ( header.column.id === "gender") {
-                    const select = document.createElement("select");
-                    select.className = "filter-select";
-                    const options = [
-                        {
-                            value: "both",
-                            label: "Both",
-                        },
-                        {
-                            value: "male",
-                            label: "Male",
-                        },
-                        {
-                            value: "female",
-                            label: "Female",
-                        },
-                    ];
-
-                    options.forEach((option) => {
-                            const optionElement = document.createElement("option");
-                            optionElement.value = option.value;
-                            optionElement.textContent = option.label;
-                            select.appendChild(optionElement);
-                        }
-                    );
-
-                    select.value = header.column.getFilterValue() ?? "both";
-                    select.addEventListener("change",(event) => {
-                            header.column.setFilterValue(event.target.value);
-                        }
-                    );
-
-                    filterCell.appendChild(select);
-
-                }
-
-
-                // ------------------------------------------
-                // Normal search
-                // ------------------------------------------
-
-                else {
-
-                    const input = document.createElement("input");
-                    input.type = "text";
-                    input.className = "filter-input";
-                    input.placeholder = "Search...";
-                    input.dataset.columnId = header.column.id;
-                    input.value =
-                        String(
-                            header.column
-                                .getFilterValue() ?? ""
-                        );
-
-
-                    input.addEventListener( "input", async (event) => {
-                            const value = event.target.value;
-                            header.column.setFilterValue(value);
-
-                            if (header.column.id === "id") {
-                                if (value.trim() === "") {
-                                    table.setOptions((previous) => ({
-                                        ...previous,
-                                        data: table._sourceData ?? previous.data,
-                                    }));
-                                    return;
-                                }
-
-                                const numericValue = Number(value.trim());
-
-                                if (
-                                    Number.isInteger(numericValue) &&
-                                    String(numericValue) === value.trim()
-                                ) {
-                                    try {
-                                        const user = await findUser(numericValue);
-                                        table.setOptions((previous) => ({
-                                            ...previous,
-                                            data: [user],
-                                        }));
-                                    } catch (error) {
-                                        console.error("Failed to fetch user:", error);
-                                    }
-                                }
-                            }
-                        }
-                    );
-
-                    filterCell.appendChild(input);
-                }
+                    header.column.getToggleSortingHandler()?.(event);
+                });
             }
-            
-            headerRow.appendChild(headerCell);
-            filterRow.appendChild(filterCell);
 
-        }
-        );
+            headerRow.appendChild(headerCell);
+        });
 
         thead.appendChild(headerRow);
-        thead.appendChild(filterRow);
-    }
-    );
+    });
 
 
     // ==================================================
