@@ -151,6 +151,96 @@ On each column, these TanStack methods are used:
 
 This is the key point: the code is not using plain DOM table logic. It is using TanStack's table state and model, then converting that into HTML in the browser.
 
+## Complete TanStack Table API used in this project
+
+These are all the TanStack table pieces actually used in the app:
+
+### Core construction and state
+
+- `constructTable(...)`
+  - Creates the table instance from columns, data, features, and initial state.
+- `table.store.subscribe(...)`
+  - Reacts to updates in the table store.
+- `table.store.state.pagination.pageIndex`
+  - Reads the current page index from TanStack state.
+
+### Feature registration
+
+- `tableFeatures(...)`
+  - Registers enabled features.
+- `storeReactivityBindings()`
+  - Makes table state reactive.
+- `rowSortingFeature`
+  - Enables row sorting.
+- `columnFilteringFeature`
+  - Enables column filtering.
+- `rowPaginationFeature`
+  - Enables pagination.
+
+### Models
+
+- `createSortedRowModel()`
+  - Produces the sorted row model.
+- `createFilteredRowModel()`
+  - Produces the filtered row model.
+- `createPaginatedRowModel()`
+  - Produces the paginated row model.
+
+### Filter functions
+
+- `filterFn_includesString`
+  - Built-in string match filter used by most text columns.
+- `genderFilterFn`
+  - Custom custom filter for the gender column.
+- `filterFns: { includesString: ... }`
+  - Registers the custom filter name used in column definitions.
+
+### Column definitions
+
+- `accessorKey`
+  - Tells TanStack which field to read from each row.
+- `header`
+  - Display title for the column.
+- `cell`
+  - Renderer for each value.
+- `filterFn`
+  - Which filter behavior should apply to that column.
+
+### Header and row accessors
+
+- `table.getHeaderGroups()`
+  - Gets the grouped header model.
+- `header.isPlaceholder`
+  - Indicates whether a header cell is a placeholder.
+- `header.column.id`
+  - Column id used to identify the column.
+- `header.column.getToggleSortingHandler()`
+  - Sort toggle handler for header clicks.
+- `header.column.getFilterValue()`
+  - Reads the active filter value for that column.
+- `header.column.setFilterValue(value)`
+  - Updates the filter value in TanStack state.
+- `table.getRowModel().rows`
+  - Gets the visible rows after sorting/filtering/pagination.
+- `row.getAllCells()`
+  - Gets all cells in a given row.
+
+### Pagination actions
+
+- `table.getCanPreviousPage()`
+  - Checks whether previous page is available.
+- `table.getCanNextPage()`
+  - Checks whether next page is available.
+- `table.previousPage()`
+  - Moves to the previous page.
+- `table.nextPage()`
+  - Moves to the next page.
+
+### Initial state
+
+- `initialState: { pagination: { pageIndex, pageSize } }`
+  - Sets the starting pagination state.
+
 ## Summary
 
 This app uses TanStack Table for:
