@@ -106,14 +106,16 @@ Each column includes:
 - `cell`: how the value is rendered
 - `filterFn`: which filter logic to use
 
-Example columns include:
+Current active columns include:
 
 - `id`
 - `firstName`
 - `lastName`
 - `age`
+- `birthDate`
 - `gender`
-- `email`
+
+The `email` column is currently commented out in `src/table/columns.js` and is not active in the table.
 
 ## 10) `FlexRender`
 
@@ -259,5 +261,8 @@ This app uses TanStack Table for:
 - pagination
 - reactive state updates
 - DOM rendering via custom UI code
+
+The current active columns are `id`, `firstName`, `lastName`, `age`, `birthDate`, and `gender`.
+The `email` column is present in the code as a commented-out example and is not currently used by the rendered table.
 
 In short, TanStack Table is acting as the table engine and state manager, while the project’s custom JavaScript is handling the browser rendering and controls.
