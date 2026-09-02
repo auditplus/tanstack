@@ -14,3 +14,15 @@ export async function loadUsers() {
 
   return result.users;
 }
+
+export async function findUser(id) {
+  const response = await fetch(`${USERS_URL}/${id}`);
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch user ${id}: ${response.status}`
+    );
+  }
+
+  return response.json();
+}

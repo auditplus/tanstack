@@ -1,4 +1,5 @@
 import { FlexRender } from "@tanstack/table-core/flex-render";
+import { findUser } from "../api/users.js";
 
 
 export function renderTable(table, app) {
@@ -7,6 +8,7 @@ export function renderTable(table, app) {
     const activeColumnId = activeElement?.dataset?.columnId;
     const cursorPosition = activeElement?.selectionStart;
     const tableElement = document.createElement("table");
+    tableElement.className = "data-table";
     const thead = document.createElement("thead");
     const tbody = document.createElement("tbody");
 
@@ -57,6 +59,7 @@ export function renderTable(table, app) {
 
                 if ( header.column.id === "gender") {
                     const select = document.createElement("select");
+                    select.className = "filter-select";
                     const options = [
                         {
                             value: "both",
@@ -99,6 +102,7 @@ export function renderTable(table, app) {
 
                     const input = document.createElement("input");
                     input.type = "text";
+                    input.className = "filter-input";
                     input.placeholder = "Search...";
                     input.dataset.columnId = header.column.id;
                     input.value =
@@ -108,10 +112,36 @@ export function renderTable(table, app) {
                         );
 
 
-                    input.addEventListener( "input", (event) => {
-                            header.column.setFilterValue(
-                                    event.target.value
-                                );
+                    input.addEventListener( "input", async (event) => {
+                            const value = event.target.value;
+                            header.column.setFilterValue(value);
+
+                            if (header.column.id === "id") {
+                                if (value.trim() === "") {
+                                    table.setOptions((previous) => ({
+                                        ...previous,
+                                        data: table._sourceData ?? previous.data,
+                                    }));
+                                    return;
+                                }
+
+                                const numericValue = Number(value.trim());
+
+                                if (
+                                    Number.isInteger(numericValue) &&
+                                    String(numericValue) === value.trim()
+                                ) {
+                                    try {
+                                        const user = await findUser(numericValue);
+                                        table.setOptions((previous) => ({
+                                            ...previous,
+                                            data: [user],
+                                        }));
+                                    } catch (error) {
+                                        console.error("Failed to fetch user:", error);
+                                    }
+                                }
+                            }
                         }
                     );
 
@@ -161,6 +191,7 @@ export function renderTable(table, app) {
     // ==================================================
 
     const pagination = document.createElement("div");
+    pagination.className = "pagination";
 
     const previous = document.createElement("button");
     previous.textContent = "Previous";
