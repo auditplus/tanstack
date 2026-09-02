@@ -144,7 +144,7 @@ async function start() {
     initialState: {
       pagination: {
         pageIndex: 0,
-        pageSize: 8,
+        pageSize: 16,
       },
     },
   });
