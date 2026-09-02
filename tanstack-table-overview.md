@@ -121,6 +121,36 @@ Imported from `@tanstack/table-core/flex-render`.
 
 Used in `src/ui/table.js` to render table cells and headers cleanly. It helps TanStack output values in the DOM without hardcoded assumptions about the structure.
 
+## 11) Direct TanStack methods used in the renderer
+
+These are the exact TanStack API calls used inside `src/ui/table.js`:
+
+- `table.getHeaderGroups()`
+  - Returns the grouped header model from TanStack so the app can render the header row and filter row.
+- `table.getRowModel().rows`
+  - Returns the current filtered/sorted/paginated rows.
+- `table.getCanPreviousPage()`
+  - Tells the UI whether the previous-page button should be enabled.
+- `table.getCanNextPage()`
+  - Tells the UI whether the next-page button should be enabled.
+- `table.previousPage()` / `table.nextPage()`
+  - TanStack pagination actions that move the current page index.
+- `table.store.subscribe(...)`
+  - Subscribes to table state updates so rendering happens whenever state changes.
+- `table.store.state.pagination.pageIndex`
+  - Reads the current pagination state from TanStack’s internal store.
+
+On each column, these TanStack methods are used:
+
+- `header.column.getToggleSortingHandler()`
+  - Activates the sort toggle when the header is clicked.
+- `header.column.getFilterValue()`
+  - Reads the current filter value for that column.
+- `header.column.setFilterValue(value)`
+  - Updates the filter value in TanStack state.
+
+This is the key point: the code is not using plain DOM table logic. It is using TanStack's table state and model, then converting that into HTML in the browser.
+
 ## Summary
 
 This app uses TanStack Table for:
