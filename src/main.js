@@ -82,6 +82,13 @@ const sendRequestButton = requestPanel.querySelector("#send-request");
 
 let activeTable = null;
 
+function setRequestLoading(isLoading) {
+  sendRequestButton.disabled = isLoading;
+  sendRequestButton.innerHTML = isLoading
+    ? '<span class="spinner" aria-hidden="true"></span> Loading...'
+    : "Send Request";
+}
+
 function buildColumnsFromRows(rows) {
   if (!rows.length) {
     return columns;
@@ -151,6 +158,9 @@ async function start() {
   renderTable(table, tableRoot);
 
   sendRequestButton.addEventListener("click", async () => {
+    setRequestLoading(true);
+    requestResponse.textContent = "Loading...";
+
     try {
       const url = requestUrlInput.value.trim();
       const token = requestTokenInput.value.trim();
@@ -185,6 +195,8 @@ async function start() {
       }
     } catch (error) {
       requestResponse.textContent = `Request failed:\n${error.message}`;
+    } finally {
+      setRequestLoading(false);
     }
   });
 }
