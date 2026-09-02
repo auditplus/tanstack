@@ -27,11 +27,19 @@ export function renderTable(table, app) {
                 // ------------------------------------------
                 // Header
                 // ------------------------------------------
+                const headerText = String(FlexRender({ header }) ?? "");
 
-                headerCell.textContent =
-                    String(
-                        FlexRender({ header }) ?? ""
-                    );
+                const sorted = header.column.getIsSorted();
+
+                let arrow = "";
+
+                if (sorted === "asc") {
+                arrow = " ↑";
+                } else if (sorted === "desc") {
+                arrow = " ↓";
+                }
+
+                headerCell.textContent = headerText + arrow;
 
 
                 // ------------------------------------------

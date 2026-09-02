@@ -26,16 +26,22 @@ export const columns = [
     cell: (info) => info.getValue(),
     filterFn: "includesString",
   },
+  // {
+  //   accessorKey: "email",
+  //   header: "Email",
+  //   cell: (info) => info.getValue(),
+  //   filterFn: "includesString",
+  // },
+  {
+    accessorKey: "birthDate",
+    header: "Birth Date",
+    cell: (info) => info.getValue(),
+    filterFn: "includesString",
+  },
   {
     accessorKey: "gender",
     header: "Gender",
     cell: (info) => info.getValue(),
     filterFn: genderFilterFn,
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-    cell: (info) => info.getValue(),
-    filterFn: "includesString",
   },
 ];

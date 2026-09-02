@@ -203,6 +203,8 @@ These are all the TanStack table pieces actually used in the app:
   - Display title for the column.
 - `cell`
   - Renderer for each value.
+- `cell: (info) => info.getValue()`
+  - Common pattern used to output the underlying value from a cell.
 - `filterFn`
   - Which filter behavior should apply to that column.
 
@@ -216,6 +218,8 @@ These are all the TanStack table pieces actually used in the app:
   - Column id used to identify the column.
 - `header.column.getToggleSortingHandler()`
   - Sort toggle handler for header clicks.
+- `header.column.getIsSorted()`
+  - Returns the current sort direction for the column (`asc`, `desc`, or false).
 - `header.column.getFilterValue()`
   - Reads the active filter value for that column.
 - `header.column.setFilterValue(value)`
@@ -224,6 +228,10 @@ These are all the TanStack table pieces actually used in the app:
   - Gets the visible rows after sorting/filtering/pagination.
 - `row.getAllCells()`
   - Gets all cells in a given row.
+- `cell.getValue()` / `info.getValue()`
+  - Reads the raw value from the current cell or column cell context.
+- `row.getValue(columnId)`
+  - Reads a value from a row by column id, used in the custom gender filter.
 
 ### Pagination actions
 
