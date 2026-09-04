@@ -17,6 +17,7 @@ app.appendChild(tableRoot);
 
 const requestPanel = document.createElement("section");
 requestPanel.className = "request-panel";
+
 requestPanel.innerHTML = `
   <div class="request-header">
     <h3>API Request</h3>
@@ -30,7 +31,7 @@ requestPanel.innerHTML = `
 
     <label>
       <span>Auth Token</span>
-      <input id="request-token" type="text" value="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsInNjb3BlIjoibWVtYmVyIn0.eyJpZCI6eyIkb2lkIjoiNjc3NDg1ODAwMDAwMDAwMDAwMDAwMDAwIn0sIm5hbWUiOiJhZG1pbiIsImlzUm9vdCI6dHJ1ZSwicmVtb3RlQWNjZXNzIjp0cnVlLCJwZXJtcyI6bnVsbCwiaXN1IjoxNzg4MzQwNzkyLCJleHAiOjE3ODg0MjcxOTIsInNlc3Npb24iOiIwMWEwNjE2YS1lYjQzLTcwNTAtYTU2My0zNjcyZGM1Yzc1OWIiLCJjbGllbnQiOm51bGx9.8LQB7RqpC9WQ2DNR97O4C3sR81jJkkMYsksP48NMW8w" />
+      <input id="request-token" type="text" value="YOUR_AUTH_TOKEN" />
     </label>
   </div>
 
@@ -65,6 +66,7 @@ requestPanel.innerHTML = `
 
   <div class="request-actions">
     <button id="send-request" type="button">Send Request</button>
+    <button id="add-test-row" type="button">Add Test Row</button>
   </div>
 
   <div class="response-box">
@@ -72,6 +74,7 @@ requestPanel.innerHTML = `
     <div id="request-response">0 records</div>
   </div>
 `;
+
 app.appendChild(requestPanel);
 
 const requestUrlInput = requestPanel.querySelector("#request-url");
@@ -79,6 +82,7 @@ const requestTokenInput = requestPanel.querySelector("#request-token");
 const requestBodyInput = requestPanel.querySelector("#request-body");
 const requestResponse = requestPanel.querySelector("#request-response");
 const sendRequestButton = requestPanel.querySelector("#send-request");
+const addTestRowButton = requestPanel.querySelector("#add-test-row");
 
 let activeTable = null;
 
@@ -125,6 +129,40 @@ function buildColumnsFromRows(rows) {
     }));
 }
 
+function getCurrentRows() {
+  const rows = activeTable?.options?.data ?? [];
+
+  if (rows.length === 1 && rows[0].name === "No data yet") {
+    return [];
+  }
+
+  return rows;
+}
+
+function addTestRow() {
+  const currentRows = getCurrentRows();
+
+  const newRow = {
+    name: `TEST ITEM ${currentRows.length + 1}`,
+    assetValue: 1000,
+    sold: 10,
+    saleValue: 1200,
+    profitValue: 200,
+    profitPercentage: 20,
+  };
+
+  const updatedRows = [...currentRows, newRow];
+
+  activeTable.setOptions((previous) => ({
+    ...previous,
+    data: updatedRows,
+    columns: buildColumnsFromRows(updatedRows),
+  }));
+
+  requestResponse.textContent = `${updatedRows.length} records`;
+  renderTable(activeTable, tableRoot);
+}
+
 async function start() {
   const initialData = [
     {
@@ -152,10 +190,14 @@ async function start() {
   activeTable = table;
 
   table.store.subscribe(() => {
+    console.log("Table state changed");
+    console.log("Table state changed:", table.store.state);
     renderTable(table, tableRoot);
   });
 
   renderTable(table, tableRoot);
+
+  addTestRowButton.addEventListener("click", addTestRow);
 
   sendRequestButton.addEventListener("click", async () => {
     setRequestLoading(true);
@@ -164,9 +206,7 @@ async function start() {
     try {
       const url = requestUrlInput.value.trim();
       const token = requestTokenInput.value.trim();
-      const bodyText = requestBodyInput.value.trim();
-
-      const parsedBody = JSON.parse(bodyText);
+      const parsedBody = JSON.parse(requestBodyInput.value.trim());
 
       const response = await fetch(url, {
         method: "POST",
@@ -179,20 +219,17 @@ async function start() {
 
       const payload = await response.json();
       const rows = Array.isArray(payload?.data) ? payload.data : [];
+      const tableRows = rows.length ? rows : initialData;
 
       requestResponse.textContent = `${rows.length} records`;
 
-      if (activeTable) {
-        const responseColumns = buildColumnsFromRows(rows.length ? rows : initialData);
+      activeTable.setOptions((previous) => ({
+        ...previous,
+        data: tableRows,
+        columns: buildColumnsFromRows(tableRows),
+      }));
 
-        activeTable.setOptions((previous) => ({
-          ...previous,
-          data: rows.length ? rows : initialData,
-          columns: responseColumns,
-        }));
-
-        renderTable(activeTable, tableRoot);
-      }
+      renderTable(activeTable, tableRoot);
     } catch (error) {
       requestResponse.textContent = `Request failed:\n${error.message}`;
     } finally {

@@ -15,7 +15,6 @@ export function renderTable(table, app) {
     // ==================================================
     // HEADER
     // ==================================================
-
     table.getHeaderGroups().forEach((headerGroup) => {
         const headerRow = document.createElement("tr");
 
@@ -52,24 +51,26 @@ export function renderTable(table, app) {
     // BODY
     // ==================================================
 
-    table.getRowModel().rows.forEach( (row) => {
-            const tr = document.createElement("tr");
+    table.getRowModel().rows.forEach((row) => {
+        const tr = document.createElement("tr");
 
-            row.getAllCells().forEach(
-                (cell) => {
+        row.getAllCells().forEach(
+            (cell) => {
 
-                    const td = document.createElement("td");
-                    td.textContent =
-                        String(
-                            FlexRender({ cell }) ?? ""
-                        );
+                const td = document.createElement("td");
+                let x = { cell: cell };
+                console.log(x);
+                td.textContent =
+                    String(
+                        FlexRender(x) ?? ""
+                    );
 
-                    tr.appendChild(td);
-                }
-            );
+                tr.appendChild(td);
+            }
+        );
 
-            tbody.appendChild(tr);
-        }
+        tbody.appendChild(tr);
+    }
     );
 
 
@@ -86,8 +87,8 @@ export function renderTable(table, app) {
 
 
     previous.addEventListener("click", () => {
-            table.previousPage();
-        }
+        table.previousPage();
+    }
     );
 
     const page = document.createElement("span");
@@ -98,9 +99,9 @@ export function renderTable(table, app) {
     next.disabled = !table.getCanNextPage();
 
 
-    next.addEventListener("click",() => {
-            table.nextPage();
-        }
+    next.addEventListener("click", () => {
+        table.nextPage();
+    }
     );
 
 
